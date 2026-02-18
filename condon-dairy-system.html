@@ -1,0 +1,4033 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>Condon Dairy Services - Management System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+    <!-- jsPDF Library for PDF Generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --delaval-blue: #0051A5;
+            --delaval-dark-blue: #003875;
+            --delaval-light-blue: #E6F0FF;
+            --delaval-accent: #FF6B00;
+            --success-green: #00A862;
+            --warning-yellow: #FFC107;
+            --error-red: #DC3545;
+            --text-primary: #1a1a1a;
+            --text-secondary: #666;
+            --bg-light: #F8FAFB;
+            --border-color: #E0E6ED;
+            --white: #FFFFFF;
+            --shadow-sm: 0 2px 4px rgba(0,81,165,0.08);
+            --shadow-md: 0 4px 12px rgba(0,81,165,0.12);
+            --shadow-lg: 0 8px 24px rgba(0,81,165,0.16);
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #003875 0%, #0051A5 50%, #0066CC 100%);
+            color: white;
+            padding: 1.5rem 2rem;
+            box-shadow: 0 8px 32px rgba(0,81,165,0.3);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 3px solid var(--delaval-accent);
+            backdrop-filter: blur(20px);
+        }
+
+        .header-content {
+            max-width: 1600px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            color: var(--delaval-blue);
+            font-size: 24px;
+            box-shadow: 0 4px 16px rgba(255,255,255,0.3), inset 0 1px 0 rgba(255,255,255,0.8);
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+
+        .header-title {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .header-title h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.75rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .header-subtitle {
+            font-size: 0.875rem;
+            opacity: 0.9;
+            font-weight: 400;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 1rem;
+            background: rgba(255,255,255,0.15);
+            border-radius: 50px;
+            backdrop-filter: blur(10px);
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: white;
+            color: var(--delaval-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        /* Main Layout */
+        .main-container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 2rem;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-md);
+            height: fit-content;
+            position: sticky;
+            top: 120px;
+        }
+
+        /* Mobile Menu Toggle */
+        .mobile-menu-toggle {
+            display: none;
+        }
+
+        .sidebar-overlay {
+            display: none;
+        }
+
+        @media (max-width: 1024px) {
+            .mobile-menu-toggle {
+                display: flex;
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                width: 56px;
+                height: 56px;
+                border-radius: 50%;
+                background: linear-gradient(135deg, var(--delaval-blue), var(--delaval-dark-blue));
+                color: white;
+                border: none;
+                box-shadow: 0 4px 16px rgba(0,81,165,0.4);
+                cursor: pointer;
+                z-index: 1001;
+                align-items: center;
+                justify-content: center;
+                font-size: 24px;
+                transition: all 0.3s ease;
+            }
+
+            .mobile-menu-toggle:active {
+                transform: scale(0.95);
+            }
+
+            .sidebar {
+                position: fixed;
+                top: 90px;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                z-index: 1000;
+                max-width: 100%;
+                border-radius: 0;
+                transform: translateX(-100%);
+                height: calc(100vh - 90px);
+                overflow-y: auto;
+                transition: transform 0.3s ease;
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .sidebar-overlay {
+                display: none;
+                position: fixed;
+                top: 90px;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0,0,0,0.5);
+                z-index: 999;
+            }
+
+            .sidebar-overlay.active {
+                display: block;
+            }
+        }
+
+        .nav-section {
+            margin-bottom: 2rem;
+        }
+
+        .nav-section-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-secondary);
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            padding: 0 0.75rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.875rem 0.75rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-primary);
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .nav-item:hover {
+            background: var(--delaval-light-blue);
+            color: var(--delaval-blue);
+            transform: translateX(4px);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(135deg, var(--delaval-blue), var(--delaval-dark-blue));
+            color: white;
+            box-shadow: 0 4px 12px rgba(0,81,165,0.3);
+            position: relative;
+        }
+
+        .nav-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 60%;
+            background: var(--delaval-accent);
+            border-radius: 0 4px 4px 0;
+        }
+
+        .nav-icon {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Content Area */
+        .content {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        /* Dashboard Cards */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 16px;
+            padding: 1.75rem;
+            box-shadow: 0 2px 8px rgba(0,81,165,0.08);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(0,81,165,0.08);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-6px) scale(1.02);
+            box-shadow: 0 12px 32px rgba(0,81,165,0.2);
+            border-color: var(--delaval-blue);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--delaval-blue), var(--delaval-accent), var(--delaval-blue));
+            background-size: 200% 100%;
+            animation: gradientShift 3s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .stat-icon.blue { background: var(--delaval-light-blue); color: var(--delaval-blue); }
+        .stat-icon.green { background: #E6F9F3; color: var(--success-green); }
+        .stat-icon.orange { background: #FFF3E6; color: var(--delaval-accent); }
+        .stat-icon.red { background: #FFE6E6; color: var(--error-red); }
+
+        .stat-value {
+            font-size: 2.25rem;
+            font-weight: 800;
+            font-family: 'Space Grotesk', sans-serif;
+            color: var(--text-primary);
+            line-height: 1;
+            margin-bottom: 0.5rem;
+            letter-spacing: -1px;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .stat-change {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 0.25rem 0.5rem;
+            border-radius: 6px;
+            margin-top: 0.5rem;
+        }
+
+        .stat-change.positive {
+            background: #E6F9F3;
+            color: var(--success-green);
+        }
+
+        .stat-change.negative {
+            background: #FFE6E6;
+            color: var(--error-red);
+        }
+
+        /* Section Card */
+        .section-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(0,81,165,0.08);
+            overflow: hidden;
+            border: 1px solid rgba(0,81,165,0.08);
+            transition: all 0.3s ease;
+        }
+
+        .section-card:hover {
+            box-shadow: 0 8px 24px rgba(0,81,165,0.12);
+        }
+
+        .section-header {
+            padding: 1.75rem 2rem;
+            border-bottom: 2px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(to right, rgba(0,81,165,0.03), transparent);
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            font-family: 'Space Grotesk', sans-serif;
+            color: var(--text-primary);
+            letter-spacing: -0.5px;
+        }
+
+        .section-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            min-height: 44px; /* Touch-friendly minimum */
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--delaval-blue), var(--delaval-dark-blue));
+            color: white;
+            box-shadow: 0 4px 12px rgba(0,81,165,0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,81,165,0.4);
+        }
+
+        .btn-secondary {
+            background: var(--bg-light);
+            color: var(--text-primary);
+            border: 2px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--delaval-light-blue);
+            border-color: var(--delaval-blue);
+            color: var(--delaval-blue);
+        }
+
+        .btn-success {
+            background: var(--success-green);
+            color: white;
+        }
+
+        .btn-icon {
+            padding: 0.75rem;
+            min-width: unset;
+        }
+
+        /* Payment Buttons */
+        .btn-payment {
+            padding: 0.5rem 0.75rem;
+            border-radius: 8px;
+            border: 2px solid var(--delaval-blue);
+            background: white;
+            color: var(--delaval-blue);
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            min-width: 50px;
+            min-height: 36px;
+        }
+
+        .btn-payment:hover {
+            background: var(--delaval-blue);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,81,165,0.3);
+        }
+
+        .btn-payment:active {
+            transform: translateY(0);
+        }
+
+        .btn-payment.paid-50 {
+            background: var(--warning-yellow);
+            border-color: var(--warning-yellow);
+            color: white;
+        }
+
+        .btn-payment.paid-100 {
+            background: var(--success-green);
+            border-color: var(--success-green);
+            color: white;
+        }
+
+        /* Table */
+        .table-container {
+            padding: 2rem;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+        }
+
+        /* Mobile scroll hint */
+        @media (max-width: 768px) {
+            .table-container::after {
+                content: '← Scroll to see more →';
+                display: block;
+                text-align: center;
+                padding: 1rem;
+                color: var(--text-secondary);
+                font-size: 0.85rem;
+                font-style: italic;
+            }
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        thead {
+            background: var(--bg-light);
+        }
+
+        th {
+            padding: 1rem 1.5rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        td {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.95rem;
+        }
+
+        tr:hover td {
+            background: var(--delaval-light-blue);
+            transition: background 0.2s ease;
+        }
+
+        tr {
+            transition: all 0.2s ease;
+        }
+
+        tbody tr:hover {
+            transform: scale(1.01);
+            box-shadow: 0 2px 8px rgba(0,81,165,0.1);
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.375rem 0.875rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+
+        .badge-success {
+            background: #E6F9F3;
+            color: var(--success-green);
+        }
+
+        .badge-warning {
+            background: #FFF9E6;
+            color: #D97706;
+        }
+
+        .badge-danger {
+            background: #FFE6E6;
+            color: var(--error-red);
+        }
+
+        .badge-info {
+            background: var(--delaval-light-blue);
+            color: var(--delaval-blue);
+        }
+
+        /* Forms */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            padding: 2rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            padding: 0.875rem 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--delaval-blue);
+            box-shadow: 0 0 0 4px rgba(0,81,165,0.1);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .quick-action-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,81,165,0.06);
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quick-action-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--delaval-light-blue), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .quick-action-card:hover::before {
+            opacity: 1;
+        }
+
+        .quick-action-card:hover {
+            border-color: var(--delaval-blue);
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 8px 24px rgba(0,81,165,0.15);
+        }
+
+        .quick-action-card > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        .quick-action-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: var(--delaval-light-blue);
+            color: var(--delaval-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin-bottom: 0.75rem;
+        }
+
+        .quick-action-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .quick-action-desc {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        /* Search Bar */
+        .search-bar {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 1rem 1rem 1rem 3rem;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--delaval-blue);
+            box-shadow: 0 0 0 4px rgba(0,81,165,0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Modal Overlay */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            padding: 2rem;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 800px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            padding: 2rem;
+            border-bottom: 2px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            font-family: 'Space Grotesk', sans-serif;
+            color: var(--text-primary);
+            letter-spacing: -0.5px;
+        }
+
+        .modal-close {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            border: none;
+            background: var(--bg-light);
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 1.5rem;
+            transition: all 0.2s;
+        }
+
+        .modal-close:hover {
+            background: var(--error-red);
+            color: white;
+        }
+
+        .modal-body {
+            padding: 2rem;
+        }
+
+        .modal-footer {
+            padding: 1.5rem 2rem;
+            border-top: 2px solid var(--border-color);
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            background: var(--bg-light);
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            height: 8px;
+            background: var(--border-color);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 0.5rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--delaval-blue), var(--delaval-accent));
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+
+        /* Customer Avatar */
+        .customer-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--delaval-light-blue);
+            color: var(--delaval-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        /* Customer Card Clickable */
+        .customer-card {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .customer-card:hover {
+            transform: translateY(-6px) scale(1.02);
+            box-shadow: 0 12px 32px rgba(0,81,165,0.25);
+            border-color: var(--delaval-blue);
+        }
+
+        .customer-card:active {
+            transform: translateY(-4px) scale(1.01);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .main-container {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                position: static;
+            }
+
+            .header-content {
+                gap: 1rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 1rem;
+            }
+
+            .header-content {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .header-title h1 {
+                font-size: 1.25rem;
+            }
+
+            .logo {
+                width: 40px;
+                height: 40px;
+                font-size: 20px;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .main-container {
+                padding: 1rem;
+                gap: 1rem;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stat-card {
+                padding: 1.25rem;
+            }
+
+            .stat-value {
+                font-size: 1.75rem;
+            }
+
+            .section-header {
+                padding: 1.25rem 1rem;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .section-actions {
+                width: 100%;
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .table-container {
+                overflow-x: auto;
+                padding: 1rem;
+            }
+
+            table {
+                min-width: 800px;
+            }
+
+            .tabs {
+                padding: 0 1rem;
+                overflow-x: auto;
+            }
+
+            .tab {
+                padding: 0.75rem 1rem;
+                font-size: 0.85rem;
+            }
+
+            .modal {
+                margin: 1rem;
+                max-width: calc(100vw - 2rem);
+            }
+
+            .modal-header {
+                padding: 1.25rem;
+            }
+
+            .modal-title {
+                font-size: 1.25rem;
+            }
+
+            .modal-body {
+                padding: 1.25rem;
+            }
+
+            .modal-footer {
+                padding: 1rem 1.25rem;
+                flex-direction: column;
+            }
+
+            .modal-footer .btn {
+                width: 100%;
+            }
+
+            .quick-actions {
+                grid-template-columns: 1fr;
+            }
+
+            .user-info {
+                padding: 0.5rem 0.75rem;
+                font-size: 0.85rem;
+            }
+
+            .user-avatar {
+                width: 32px;
+                height: 32px;
+                font-size: 0.85rem;
+            }
+
+            .nav-item {
+                padding: 0.75rem;
+            }
+
+            .sidebar {
+                padding: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stat-card {
+                padding: 1rem;
+            }
+
+            .stat-value {
+                font-size: 1.5rem;
+            }
+
+            .stat-label {
+                font-size: 0.8rem;
+            }
+
+            .section-title {
+                font-size: 1.25rem;
+            }
+
+            th, td {
+                padding: 0.75rem;
+                font-size: 0.85rem;
+            }
+
+            .search-input {
+                font-size: 0.9rem;
+            }
+
+            .btn-payment {
+                padding: 0.4rem 0.6rem;
+                font-size: 0.8rem;
+                min-width: 45px;
+                min-height: 32px;
+            }
+
+            .mobile-menu-toggle {
+                width: 50px;
+                height: 50px;
+                bottom: 15px;
+                right: 15px;
+            }
+        }
+
+        /* Loading Animation */
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--border-color);
+            border-top-color: var(--delaval-blue);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.3;
+        }
+
+        .empty-state-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            border-bottom: 2px solid var(--border-color);
+            padding: 0 2rem;
+            overflow-x: auto;
+        }
+
+        .tab {
+            padding: 1rem 1.5rem;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--text-secondary);
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .tab:hover {
+            color: var(--delaval-blue);
+        }
+
+        .tab.active {
+            color: var(--delaval-blue);
+            border-bottom-color: var(--delaval-blue);
+        }
+
+        .tab-content {
+            display: none;
+            padding: 2rem;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Parts Allocation Status */
+        .allocation-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .allocation-status.available {
+            background: #E6F9F3;
+            color: var(--success-green);
+        }
+
+        .allocation-status.allocated {
+            background: #FFF9E6;
+            color: #D97706;
+        }
+
+        .allocation-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo-section">
+                <div class="logo">CD</div>
+                <div class="header-title">
+                    <h1>Condon Dairy Services</h1>
+                    <div class="header-subtitle">Powered by DeLaval Technology</div>
+                </div>
+            </div>
+            <div class="header-actions">
+                <div class="user-info">
+                    <div class="user-avatar">JD</div>
+                    <div>
+                        <div style="font-weight: 600;">John Condon</div>
+                        <div style="font-size: 0.8rem; opacity: 0.8;">Administrator</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <!-- Sidebar Overlay for Mobile -->
+        <div class="sidebar-overlay" onclick="toggleMobileMenu()"></div>
+
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar" id="sidebar">
+            <div class="nav-section">
+                <div class="nav-section-title">Main</div>
+                <div class="nav-item active" onclick="showView('dashboard')">
+                    <div class="nav-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="14" width="7" height="7"></rect>
+                            <rect x="3" y="14" width="7" height="7"></rect>
+                        </svg>
+                    </div>
+                    <span>Dashboard</span>
+                </div>
+                <div class="nav-item" onclick="showView('jobs')">
+                    <div class="nav-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
+                        </svg>
+                    </div>
+                    <span>Jobs & Services</span>
+                </div>
+                <div class="nav-item" onclick="showView('customers')">
+                    <div class="nav-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                        </svg>
+                    </div>
+                    <span>Customers</span>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Inventory</div>
+                <div class="nav-item" onclick="showView('inventory')">
+                    <div class="nav-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                            <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                            <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                        </svg>
+                    </div>
+                    <span>Parts Inventory</span>
+                </div>
+                <div class="nav-item" onclick="showView('allocation')">
+                    <div class="nav-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <circle cx="12" cy="12" r="6"></circle>
+                            <circle cx="12" cy="12" r="2"></circle>
+                        </svg>
+                    </div>
+                    <span>Parts Allocation</span>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Financial</div>
+                <div class="nav-item" onclick="showView('invoices')">
+                    <div class="nav-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="8" x2="12" y2="12"></line>
+                            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                        </svg>
+                    </div>
+                    <span>Invoices</span>
+                </div>
+                <div class="nav-item" onclick="showView('quotes')">
+                    <div class="nav-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
+                    </div>
+                    <span>Quotes</span>
+                </div>
+                <div class="nav-item" onclick="showView('payments')">
+                    <div class="nav-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                            <line x1="1" y1="10" x2="23" y2="10"></line>
+                        </svg>
+                    </div>
+                    <span>Payments</span>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Reports</div>
+                <div class="nav-item" onclick="showView('reports')">
+                    <div class="nav-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="20" x2="18" y2="10"></line>
+                            <line x1="12" y1="20" x2="12" y2="4"></line>
+                            <line x1="6" y1="20" x2="6" y2="14"></line>
+                        </svg>
+                    </div>
+                    <span>Analytics</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="content">
+            <!-- Dashboard View -->
+            <div id="dashboard-view" class="view-content">
+                <!-- Stats Grid -->
+                <div class="dashboard-grid">
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div>
+                                <div class="stat-value">€42,850</div>
+                                <div class="stat-label">Outstanding Balance</div>
+                                <div class="stat-change negative">↓ €2,400 from last month</div>
+                            </div>
+                            <div class="stat-icon blue">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M19 6h-3c-1.66 0-3 1.34-3 3v6c0 1.66 1.34 3 3 3h3"></path>
+                                    <line x1="15" y1="12" x2="21" y2="12"></line>
+                                    <line x1="15" y1="9" x2="20" y2="9"></line>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div>
+                                <div class="stat-value">28</div>
+                                <div class="stat-label">Active Jobs</div>
+                                <div class="stat-change positive">↑ 6 from last week</div>
+                            </div>
+                            <div class="stat-icon green">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div>
+                                <div class="stat-value">€18,200</div>
+                                <div class="stat-label">Overdue Invoices</div>
+                                <div class="stat-change negative">12 invoices</div>
+                            </div>
+                            <div class="stat-icon red">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                                    <line x1="12" y1="9" x2="12" y2="13"></line>
+                                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div>
+                                <div class="stat-value">347</div>
+                                <div class="stat-label">Parts Allocated</div>
+                                <div class="stat-change positive">To 18 jobs</div>
+                            </div>
+                            <div class="stat-icon orange">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                                    <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                                    <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="quick-actions">
+                    <div class="quick-action-card" onclick="openModal('newJob')">
+                        <div class="quick-action-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                            </svg>
+                        </div>
+                        <div class="quick-action-title">New Job</div>
+                        <div class="quick-action-desc">Create service job</div>
+                    </div>
+                    <div class="quick-action-card" onclick="openModal('newCustomer')">
+                        <div class="quick-action-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                        </div>
+                        <div class="quick-action-title">Add Customer</div>
+                        <div class="quick-action-desc">Register new account</div>
+                    </div>
+                    <div class="quick-action-card" onclick="openModal('oneTimeInvoice')">
+                        <div class="quick-action-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                                <line x1="8" y1="21" x2="16" y2="21"></line>
+                                <line x1="12" y1="17" x2="12" y2="21"></line>
+                            </svg>
+                        </div>
+                        <div class="quick-action-title">One-Time Invoice</div>
+                        <div class="quick-action-desc">Instant charge invoice</div>
+                    </div>
+                    <div class="quick-action-card" onclick="openModal('newQuote')">
+                        <div class="quick-action-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                            </svg>
+                        </div>
+                        <div class="quick-action-title">Create Quote</div>
+                        <div class="quick-action-desc">Generate estimate</div>
+                    </div>
+                    <div class="quick-action-card" onclick="openModal('generateInvoice')">
+                        <div class="quick-action-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                                <line x1="16" y1="13" x2="8" y2="13"></line>
+                                <line x1="16" y1="17" x2="8" y2="17"></line>
+                            </svg>
+                        </div>
+                        <div class="quick-action-title">Monthly Invoice</div>
+                        <div class="quick-action-desc">Bill customer account</div>
+                    </div>
+                </div>
+
+                <!-- Recent Jobs -->
+                <div class="section-card">
+                    <div class="section-header">
+                        <h2 class="section-title">Recent Jobs</h2>
+                        <div class="section-actions">
+                            <button class="btn btn-secondary">View All</button>
+                            <button class="btn btn-primary" onclick="openModal('newJob')">+ New Job</button>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Job ID</th>
+                                    <th>Customer</th>
+                                    <th>Type</th>
+                                    <th>Engineer</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                    <th>Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>#JOB-2847</strong></td>
+                                    <td>
+                                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                            <div class="customer-avatar">MF</div>
+                                            <div>Murphy Farm Ltd</div>
+                                        </div>
+                                    </td>
+                                    <td>Milking System Service</td>
+                                    <td>Pat O'Brien</td>
+                                    <td>Jan 28, 2025</td>
+                                    <td><span class="badge badge-success">Completed</span></td>
+                                    <td><strong>€1,245</strong></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>#JOB-2846</strong></td>
+                                    <td>
+                                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                            <div class="customer-avatar">OD</div>
+                                            <div>O'Sullivan Dairy</div>
+                                        </div>
+                                    </td>
+                                    <td>Pump Replacement</td>
+                                    <td>Sean Murphy</td>
+                                    <td>Jan 27, 2025</td>
+                                    <td><span class="badge badge-warning">In Progress</span></td>
+                                    <td><strong>€890</strong></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>#JOB-2845</strong></td>
+                                    <td>
+                                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                            <div class="customer-avatar">KC</div>
+                                            <div>Kelly Cattle Co</div>
+                                        </div>
+                                    </td>
+                                    <td>Annual Inspection</td>
+                                    <td>Michael Flynn</td>
+                                    <td>Jan 26, 2025</td>
+                                    <td><span class="badge badge-success">Completed</span></td>
+                                    <td><strong>€450</strong></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>#JOB-2844</strong></td>
+                                    <td>
+                                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                            <div class="customer-avatar">BD</div>
+                                            <div>Byrne Dairy Farm</div>
+                                        </div>
+                                    </td>
+                                    <td>Emergency Repair</td>
+                                    <td>Pat O'Brien</td>
+                                    <td>Jan 25, 2025</td>
+                                    <td><span class="badge badge-info">Scheduled</span></td>
+                                    <td><strong>€1,680</strong></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Jobs View -->
+            <div id="jobs-view" class="view-content" style="display: none;">
+                <div class="section-card">
+                    <div class="section-header">
+                        <h2 class="section-title">Jobs & Services</h2>
+                        <div class="section-actions">
+                            <button class="btn btn-secondary">
+                                Export
+                            </button>
+                            <button class="btn btn-primary" onclick="openModal('newJob')">
+                                + New Job
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="tabs">
+                        <button class="tab active" onclick="switchTab(event, 'all-jobs')">All Jobs (28)</button>
+                        <button class="tab" onclick="switchTab(event, 'scheduled')">Scheduled (8)</button>
+                        <button class="tab" onclick="switchTab(event, 'in-progress')">In Progress (12)</button>
+                        <button class="tab" onclick="switchTab(event, 'completed')">Completed (8)</button>
+                    </div>
+
+                    <div id="all-jobs" class="tab-content active">
+                        <div class="search-bar">
+                            <span class="search-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="11" cy="11" r="8"></circle>
+                                    <path d="m21 21-4.35-4.35"></path>
+                                </svg>
+                            </span>
+                            <input type="text" class="search-input" placeholder="Search jobs by customer, engineer, or job ID...">
+                        </div>
+
+                        <div class="table-container" style="padding-top: 0;">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Job Details</th>
+                                        <th>Customer</th>
+                                        <th>Service Type</th>
+                                        <th>Engineer</th>
+                                        <th>Date</th>
+                                        <th>Parts Used</th>
+                                        <th>Labour</th>
+                                        <th>Total</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <div><strong>#JOB-2847</strong></div>
+                                            <div style="font-size: 0.85rem; color: var(--text-secondary);">Service call</div>
+                                        </td>
+                                        <td>Murphy Farm Ltd</td>
+                                        <td>Milking System Service</td>
+                                        <td>Pat O'Brien</td>
+                                        <td>Jan 28, 2025</td>
+                                        <td>€845</td>
+                                        <td>3.5 hrs</td>
+                                        <td><strong>€1,245</strong></td>
+                                        <td><span class="badge badge-success">Completed</span></td>
+                                        <td>
+                                            <button class="btn btn-secondary btn-icon" title="View Details">View</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div><strong>#JOB-2846</strong></div>
+                                            <div style="font-size: 0.85rem; color: var(--text-secondary);">Repair work</div>
+                                        </td>
+                                        <td>O'Sullivan Dairy</td>
+                                        <td>Pump Replacement</td>
+                                        <td>Sean Murphy</td>
+                                        <td>Jan 27, 2025</td>
+                                        <td>€690</td>
+                                        <td>2 hrs</td>
+                                        <td><strong>€890</strong></td>
+                                        <td><span class="badge badge-warning">In Progress</span></td>
+                                        <td>
+                                            <button class="btn btn-secondary btn-icon" title="View Details">View</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Scheduled Jobs Tab -->
+                    <div id="scheduled" class="tab-content">
+                        <div class="search-bar">
+                            <span class="search-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="11" cy="11" r="8"></circle>
+                                    <path d="m21 21-4.35-4.35"></path>
+                                </svg>
+                            </span>
+                            <input type="text" class="search-input" placeholder="Search scheduled jobs...">
+                        </div>
+
+                        <div class="table-container" style="padding-top: 0;">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Job Details</th>
+                                        <th>Customer</th>
+                                        <th>Service Type</th>
+                                        <th>Engineer</th>
+                                        <th>Scheduled Date</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <div><strong>#JOB-2844</strong></div>
+                                            <div style="font-size: 0.85rem; color: var(--text-secondary);">Emergency repair</div>
+                                        </td>
+                                        <td>Byrne Dairy Farm</td>
+                                        <td>Emergency Repair</td>
+                                        <td>Pat O'Brien</td>
+                                        <td>Feb 3, 2025</td>
+                                        <td><span class="badge badge-info">Scheduled</span></td>
+                                        <td>
+                                            <button class="btn btn-secondary btn-icon" title="View Details">View</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- In Progress Jobs Tab -->
+                    <div id="in-progress" class="tab-content">
+                        <div class="search-bar">
+                            <span class="search-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="11" cy="11" r="8"></circle>
+                                    <path d="m21 21-4.35-4.35"></path>
+                                </svg>
+                            </span>
+                            <input type="text" class="search-input" placeholder="Search in-progress jobs...">
+                        </div>
+
+                        <div class="table-container" style="padding-top: 0;">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Job Details</th>
+                                        <th>Customer</th>
+                                        <th>Service Type</th>
+                                        <th>Engineer</th>
+                                        <th>Started</th>
+                                        <th>Progress</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <div><strong>#JOB-2846</strong></div>
+                                            <div style="font-size: 0.85rem; color: var(--text-secondary);">Repair work</div>
+                                        </td>
+                                        <td>O'Sullivan Dairy</td>
+                                        <td>Pump Replacement</td>
+                                        <td>Sean Murphy</td>
+                                        <td>Jan 27, 2025</td>
+                                        <td>
+                                            <div style="font-size: 0.85rem; margin-bottom: 0.25rem;">75%</div>
+                                            <div class="progress-bar">
+                                                <div class="progress-fill" style="width: 75%;"></div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-secondary btn-icon" title="View Details">View</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Completed Jobs Tab -->
+                    <div id="completed" class="tab-content">
+                        <div class="search-bar">
+                            <span class="search-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="11" cy="11" r="8"></circle>
+                                    <path d="m21 21-4.35-4.35"></path>
+                                </svg>
+                            </span>
+                            <input type="text" class="search-input" placeholder="Search completed jobs...">
+                        </div>
+
+                        <div class="table-container" style="padding-top: 0;">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Job Details</th>
+                                        <th>Customer</th>
+                                        <th>Service Type</th>
+                                        <th>Engineer</th>
+                                        <th>Completed</th>
+                                        <th>Total</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <div><strong>#JOB-2847</strong></div>
+                                            <div style="font-size: 0.85rem; color: var(--text-secondary);">Service call</div>
+                                        </td>
+                                        <td>Murphy Farm Ltd</td>
+                                        <td>Milking System Service</td>
+                                        <td>Pat O'Brien</td>
+                                        <td>Jan 28, 2025</td>
+                                        <td><strong>€1,245</strong></td>
+                                        <td>
+                                            <button class="btn btn-secondary btn-icon" title="View Details">View</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div><strong>#JOB-2845</strong></div>
+                                            <div style="font-size: 0.85rem; color: var(--text-secondary);">Inspection</div>
+                                        </td>
+                                        <td>Kelly Cattle Co</td>
+                                        <td>Annual Inspection</td>
+                                        <td>Michael Flynn</td>
+                                        <td>Jan 26, 2025</td>
+                                        <td><strong>€450</strong></td>
+                                        <td>
+                                            <button class="btn btn-secondary btn-icon" title="View Details">View</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Customers View -->
+            <div id="customers-view" class="view-content" style="display: none;">
+                <div class="section-card">
+                    <div class="section-header">
+                        <h2 class="section-title">Customer Accounts</h2>
+                        <div class="section-actions">
+                            <button class="btn btn-secondary">
+                                Export
+                            </button>
+                            <button class="btn btn-primary" onclick="openModal('newCustomer')">
+                                + Add Customer
+                            </button>
+                        </div>
+                    </div>
+
+                    <div style="padding: 2rem;">
+                        <div class="search-bar">
+                            <span class="search-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="11" cy="11" r="8"></circle>
+                                    <path d="m21 21-4.35-4.35"></path>
+                                </svg>
+                            </span>
+                            <input type="text" class="search-input" placeholder="Search customers by name, location, or account number...">
+                        </div>
+
+                        <div class="dashboard-grid">
+                            <div class="stat-card customer-card" onclick="openCustomerAccount('Murphy Farm Ltd', 'murphy-farm')">
+                                <div class="customer-avatar" style="width: 60px; height: 60px; font-size: 1.5rem; margin-bottom: 1rem;">MF</div>
+                                <div style="margin-bottom: 0.5rem;">
+                                    <strong style="font-size: 1.1rem;">Murphy Farm Ltd</strong>
+                                    <div style="font-size: 0.85rem; color: var(--text-secondary);">Mitchelstown, Co. Cork</div>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; padding-top: 1rem; border-top: 2px solid var(--border-color);">
+                                    <div>
+                                        <div style="font-size: 0.8rem; color: var(--text-secondary);">Outstanding</div>
+                                        <div style="font-weight: 700; font-size: 1.1rem; color: var(--delaval-blue);">€4,280</div>
+                                    </div>
+                                    <button class="btn btn-secondary btn-icon" onclick="event.stopPropagation(); openCustomerAccount('Murphy Farm Ltd', 'murphy-farm')">→</button>
+                                </div>
+                            </div>
+
+                            <div class="stat-card customer-card" onclick="openCustomerAccount('O\'Sullivan Dairy', 'osullivan-dairy')">
+                                <div class="customer-avatar" style="width: 60px; height: 60px; font-size: 1.5rem; margin-bottom: 1rem;">OD</div>
+                                <div style="margin-bottom: 0.5rem;">
+                                    <strong style="font-size: 1.1rem;">O'Sullivan Dairy</strong>
+                                    <div style="font-size: 0.85rem; color: var(--text-secondary);">Fermoy, Co. Cork</div>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; padding-top: 1rem; border-top: 2px solid var(--border-color);">
+                                    <div>
+                                        <div style="font-size: 0.8rem; color: var(--text-secondary);">Outstanding</div>
+                                        <div style="font-weight: 700; font-size: 1.1rem; color: var(--delaval-blue);">€2,150</div>
+                                    </div>
+                                    <button class="btn btn-secondary btn-icon" onclick="event.stopPropagation(); openCustomerAccount('O\'Sullivan Dairy', 'osullivan-dairy')">→</button>
+                                </div>
+                            </div>
+
+                            <div class="stat-card customer-card" onclick="openCustomerAccount('Kelly Cattle Co', 'kelly-cattle')">
+                                <div class="customer-avatar" style="width: 60px; height: 60px; font-size: 1.5rem; margin-bottom: 1rem;">KC</div>
+                                <div style="margin-bottom: 0.5rem;">
+                                    <strong style="font-size: 1.1rem;">Kelly Cattle Co</strong>
+                                    <div style="font-size: 0.85rem; color: var(--text-secondary);">Mallow, Co. Cork</div>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; padding-top: 1rem; border-top: 2px solid var(--border-color);">
+                                    <div>
+                                        <div style="font-size: 0.8rem; color: var(--text-secondary);">Outstanding</div>
+                                        <div style="font-weight: 700; font-size: 1.1rem; color: var(--success-green);">€0</div>
+                                    </div>
+                                    <button class="btn btn-secondary btn-icon" onclick="event.stopPropagation(); openCustomerAccount('Kelly Cattle Co', 'kelly-cattle')">→</button>
+                                </div>
+                            </div>
+
+                            <div class="stat-card customer-card" onclick="openCustomerAccount('Byrne Dairy Farm', 'byrne-dairy')">
+                                <div class="customer-avatar" style="width: 60px; height: 60px; font-size: 1.5rem; margin-bottom: 1rem;">BD</div>
+                                <div style="margin-bottom: 0.5rem;">
+                                    <strong style="font-size: 1.1rem;">Byrne Dairy Farm</strong>
+                                    <div style="font-size: 0.85rem; color: var(--text-secondary);">Charleville, Co. Cork</div>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; padding-top: 1rem; border-top: 2px solid var(--border-color);">
+                                    <div>
+                                        <div style="font-size: 0.8rem; color: var(--text-secondary);">Outstanding</div>
+                                        <div style="font-weight: 700; font-size: 1.1rem; color: var(--error-red);">€8,420</div>
+                                    </div>
+                                    <button class="btn btn-secondary btn-icon" onclick="event.stopPropagation(); openCustomerAccount('Byrne Dairy Farm', 'byrne-dairy')">→</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Customer Account Detail View -->
+            <div id="customer-account-view" class="view-content" style="display: none;">
+                <!-- Back Button -->
+                <div style="margin-bottom: 1.5rem;">
+                    <button class="btn btn-secondary" onclick="showView('customers')">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 0.5rem;">
+                            <line x1="19" y1="12" x2="5" y2="12"></line>
+                            <polyline points="12 19 5 12 12 5"></polyline>
+                        </svg>
+                        Back to Customers
+                    </button>
+                </div>
+
+                <!-- Customer Header Card -->
+                <div class="section-card" style="margin-bottom: 2rem;">
+                    <div style="padding: 2rem;">
+                        <div style="display: flex; align-items: flex-start; gap: 2rem; flex-wrap: wrap;">
+                            <div class="customer-avatar" style="width: 80px; height: 80px; font-size: 2rem;">MF</div>
+                            <div style="flex: 1; min-width: 250px;">
+                                <h2 id="customerAccountName" class="section-title" style="margin-bottom: 0.5rem;">Murphy Farm Ltd</h2>
+                                <div style="color: var(--text-secondary); margin-bottom: 1rem;">
+                                    <div>Mitchelstown, Co. Cork</div>
+                                    <div>Contact: John Murphy</div>
+                                    <div>Email: john@murphyfarm.ie | Phone: +353 25 84234</div>
+                                </div>
+                                <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                                    <span class="badge badge-success">Active Account</span>
+                                    <span class="badge badge-info">Payment Terms: 30 Days</span>
+                                </div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem;">Account Balance</div>
+                                <div id="customerBalance" style="font-size: 2rem; font-weight: 800; color: var(--delaval-blue);">€4,280</div>
+                                <button class="btn btn-primary" style="margin-top: 1rem;" onclick="openModal('generateInvoice')">Generate Invoice</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Account Summary Stats -->
+                <div class="dashboard-grid" style="margin-bottom: 2rem;">
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div>
+                                <div class="stat-value">24</div>
+                                <div class="stat-label">Total Jobs Completed</div>
+                            </div>
+                            <div class="stat-icon green">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div>
+                                <div class="stat-value">€28,450</div>
+                                <div class="stat-label">Total Revenue (12 months)</div>
+                            </div>
+                            <div class="stat-icon blue">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M19 6h-3c-1.66 0-3 1.34-3 3v6c0 1.66 1.34 3 3 3h3"></path>
+                                    <line x1="15" y1="12" x2="21" y2="12"></line>
+                                    <line x1="15" y1="9" x2="20" y2="9"></line>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div>
+                                <div class="stat-value">€8,340</div>
+                                <div class="stat-label">Parts Purchased</div>
+                            </div>
+                            <div class="stat-icon orange">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabs for History -->
+                <div class="section-card">
+                    <div class="tabs">
+                        <button class="tab active" onclick="switchTab(event, 'service-history')">Service History</button>
+                        <button class="tab" onclick="switchTab(event, 'parts-history')">Parts Used</button>
+                        <button class="tab" onclick="switchTab(event, 'invoices-history')">Invoices</button>
+                        <button class="tab" onclick="switchTab(event, 'documents-history')">Documents</button>
+                    </div>
+
+                    <!-- Service History Tab -->
+                    <div id="service-history" class="tab-content active">
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Job ID</th>
+                                        <th>Service Type</th>
+                                        <th>Engineer</th>
+                                        <th>Parts Cost</th>
+                                        <th>Labour</th>
+                                        <th>Total</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Jan 28, 2025</td>
+                                        <td><strong>#JOB-2847</strong></td>
+                                        <td>Milking System Service</td>
+                                        <td>Pat O'Brien</td>
+                                        <td>€845</td>
+                                        <td>3.5 hrs</td>
+                                        <td><strong>€1,245</strong></td>
+                                        <td><span class="badge badge-success">Completed</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Jan 15, 2025</td>
+                                        <td><strong>#JOB-2812</strong></td>
+                                        <td>Pump Inspection</td>
+                                        <td>Sean Murphy</td>
+                                        <td>€0</td>
+                                        <td>1.5 hrs</td>
+                                        <td><strong>€90</strong></td>
+                                        <td><span class="badge badge-success">Completed</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Dec 28, 2024</td>
+                                        <td><strong>#JOB-2789</strong></td>
+                                        <td>Annual Inspection</td>
+                                        <td>Michael Flynn</td>
+                                        <td>€420</td>
+                                        <td>2 hrs</td>
+                                        <td><strong>€540</strong></td>
+                                        <td><span class="badge badge-success">Completed</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Dec 10, 2024</td>
+                                        <td><strong>#JOB-2765</strong></td>
+                                        <td>Emergency Repair</td>
+                                        <td>Pat O'Brien</td>
+                                        <td>€1,250</td>
+                                        <td>4 hrs</td>
+                                        <td><strong>€1,490</strong></td>
+                                        <td><span class="badge badge-success">Completed</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Parts History Tab -->
+                    <div id="parts-history" class="tab-content">
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Part Number</th>
+                                        <th>Part Name</th>
+                                        <th>Quantity Used</th>
+                                        <th>Last Used</th>
+                                        <th>Total Spent</th>
+                                        <th>Usage Trend</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>DLV-98472</strong></td>
+                                        <td>Pulsator Assembly</td>
+                                        <td>4 units</td>
+                                        <td>Jan 28, 2025</td>
+                                        <td><strong>€796</strong></td>
+                                        <td>
+                                            <div class="progress-bar" style="margin-top: 0.25rem;">
+                                                <div class="progress-fill" style="width: 60%;"></div>
+                                            </div>
+                                            <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.25rem;">Regular replacement</div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>DLV-82341</strong></td>
+                                        <td>Vacuum Pump</td>
+                                        <td>2 units</td>
+                                        <td>Dec 10, 2024</td>
+                                        <td><strong>€1,890</strong></td>
+                                        <td>
+                                            <div class="progress-bar" style="margin-top: 0.25rem;">
+                                                <div class="progress-fill" style="width: 30%;"></div>
+                                            </div>
+                                            <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.25rem;">Occasional</div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>DLV-73829</strong></td>
+                                        <td>Liner Set (4pc)</td>
+                                        <td>12 sets</td>
+                                        <td>Jan 28, 2025</td>
+                                        <td><strong>€504</strong></td>
+                                        <td>
+                                            <div class="progress-bar" style="margin-top: 0.25rem;">
+                                                <div class="progress-fill" style="width: 85%;"></div>
+                                            </div>
+                                            <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.25rem;">Frequent - consumable</div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Invoices History Tab -->
+                    <div id="invoices-history" class="tab-content">
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Invoice No.</th>
+                                        <th>Date</th>
+                                        <th>Period</th>
+                                        <th>Jobs Included</th>
+                                        <th>Amount</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>INV-2025-042</strong></td>
+                                        <td>Jan 31, 2025</td>
+                                        <td>January 2025</td>
+                                        <td>6 jobs</td>
+                                        <td><strong>€4,280</strong></td>
+                                        <td><span class="badge badge-warning">Due</span></td>
+                                        <td>
+                                            <button class="btn btn-secondary btn-icon" onclick="generateInvoicePDFFromTable('INV-2025-042', 'Murphy Farm Ltd', '€4,280', 'Jan 31, 2025')">PDF</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>INV-2024-038</strong></td>
+                                        <td>Dec 31, 2024</td>
+                                        <td>December 2024</td>
+                                        <td>4 jobs</td>
+                                        <td><strong>€3,650</strong></td>
+                                        <td><span class="badge badge-success">Paid</span></td>
+                                        <td>
+                                            <button class="btn btn-secondary btn-icon" onclick="generateInvoicePDFFromTable('INV-2024-038', 'Murphy Farm Ltd', '€3,650', 'Dec 31, 2024')">PDF</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>INV-2024-033</strong></td>
+                                        <td>Nov 30, 2024</td>
+                                        <td>November 2024</td>
+                                        <td>5 jobs</td>
+                                        <td><strong>€2,890</strong></td>
+                                        <td><span class="badge badge-success">Paid</span></td>
+                                        <td>
+                                            <button class="btn btn-secondary btn-icon" onclick="generateInvoicePDFFromTable('INV-2024-033', 'Murphy Farm Ltd', '€2,890', 'Nov 30, 2024')">PDF</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Documents Tab -->
+                    <div id="documents-history" class="tab-content">
+                        <div style="padding: 2rem;">
+                            <div class="dashboard-grid">
+                                <div class="quick-action-card">
+                                    <div class="quick-action-icon">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                            <polyline points="14 2 14 8 20 8"></polyline>
+                                        </svg>
+                                    </div>
+                                    <div class="quick-action-title">Service Reports</div>
+                                    <div class="quick-action-desc">24 documents</div>
+                                </div>
+                                <div class="quick-action-card">
+                                    <div class="quick-action-icon">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                            <polyline points="14 2 14 8 20 8"></polyline>
+                                        </svg>
+                                    </div>
+                                    <div class="quick-action-title">Invoices</div>
+                                    <div class="quick-action-desc">12 documents</div>
+                                </div>
+                                <div class="quick-action-card">
+                                    <div class="quick-action-icon">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                            <polyline points="14 2 14 8 20 8"></polyline>
+                                        </svg>
+                                    </div>
+                                    <div class="quick-action-title">Quotes</div>
+                                    <div class="quick-action-desc">8 documents</div>
+                                </div>
+                                <div class="quick-action-card">
+                                    <div class="quick-action-icon">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                            <polyline points="14 2 14 8 20 8"></polyline>
+                                        </svg>
+                                    </div>
+                                    <div class="quick-action-title">Contracts</div>
+                                    <div class="quick-action-desc">3 documents</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Inventory View -->
+            <div id="inventory-view" class="view-content" style="display: none;">
+                <div class="section-card">
+                    <div class="section-header">
+                        <h2 class="section-title">Parts Inventory</h2>
+                        <div class="section-actions">
+                            <button class="btn btn-secondary">
+                                Import CSV
+                            </button>
+                            <button class="btn btn-primary">
+                                + Add Part
+                            </button>
+                        </div>
+                    </div>
+
+                    <div style="padding: 2rem;">
+                        <div class="search-bar">
+                            <span class="search-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="11" cy="11" r="8"></circle>
+                                    <path d="m21 21-4.35-4.35"></path>
+                                </svg>
+                            </span>
+                            <input type="text" class="search-input" placeholder="Search 2,000+ DeLaval parts by SKU, name, or category...">
+                        </div>
+
+                        <div class="table-container" style="padding-top: 0;">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>SKU / Part No.</th>
+                                        <th>Part Name</th>
+                                        <th>Category</th>
+                                        <th>Cost Price</th>
+                                        <th>Sell Price</th>
+                                        <th>Stock Level</th>
+                                        <th>Location</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>DLV-98472</strong></td>
+                                        <td>Pulsator Assembly</td>
+                                        <td>Milking System</td>
+                                        <td>€142.50</td>
+                                        <td><strong>€199.00</strong></td>
+                                        <td>
+                                            <div>24 units</div>
+                                            <div class="progress-bar" style="margin-top: 0.25rem;">
+                                                <div class="progress-fill" style="width: 60%;"></div>
+                                            </div>
+                                        </td>
+                                        <td>Warehouse A</td>
+                                        <td><span class="allocation-status available"><span class="allocation-dot"></span> Available</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>DLV-82341</strong></td>
+                                        <td>Vacuum Pump</td>
+                                        <td>Pumps</td>
+                                        <td>€685.00</td>
+                                        <td><strong>€945.00</strong></td>
+                                        <td>
+                                            <div>8 units</div>
+                                            <div class="progress-bar" style="margin-top: 0.25rem;">
+                                                <div class="progress-fill" style="width: 32%;"></div>
+                                            </div>
+                                        </td>
+                                        <td>Van 2</td>
+                                        <td><span class="allocation-status available"><span class="allocation-dot"></span> Available</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>DLV-73829</strong></td>
+                                        <td>Liner Set (4pc)</td>
+                                        <td>Consumables</td>
+                                        <td>€28.90</td>
+                                        <td><strong>€42.00</strong></td>
+                                        <td>
+                                            <div>156 units</div>
+                                            <div class="progress-bar" style="margin-top: 0.25rem;">
+                                                <div class="progress-fill" style="width: 85%;"></div>
+                                            </div>
+                                        </td>
+                                        <td>Warehouse B</td>
+                                        <td><span class="allocation-status available"><span class="allocation-dot"></span> Available</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>DLV-91205</strong></td>
+                                        <td>Control Module PCB</td>
+                                        <td>Electronics</td>
+                                        <td>€245.00</td>
+                                        <td><strong>€340.00</strong></td>
+                                        <td>
+                                            <div>2 units</div>
+                                            <div class="progress-bar" style="margin-top: 0.25rem;">
+                                                <div class="progress-fill" style="width: 15%;"></div>
+                                            </div>
+                                        </td>
+                                        <td>Warehouse A</td>
+                                        <td><span class="allocation-status allocated"><span class="allocation-dot"></span> 1 Allocated</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Parts Allocation View -->
+            <div id="allocation-view" class="view-content" style="display: none;">
+                <div class="section-card">
+                    <div class="section-header">
+                        <h2 class="section-title">Parts Allocation & On-Hold</h2>
+                        <div class="section-actions">
+                            <button class="btn btn-primary">
+                                <span>🎯</span> Allocate Parts
+                            </button>
+                        </div>
+                    </div>
+
+                    <div style="padding: 2rem;">
+                        <div class="dashboard-grid" style="margin-bottom: 2rem;">
+                            <div class="stat-card">
+                                <div class="stat-header">
+                                    <div>
+                                        <div class="stat-value">347</div>
+                                        <div class="stat-label">Parts Allocated</div>
+                                    </div>
+                                    <div class="stat-icon orange">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                                            <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                                            <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-header">
+                                    <div>
+                                        <div class="stat-value">18</div>
+                                        <div class="stat-label">Active Jobs</div>
+                                    </div>
+                                    <div class="stat-icon blue">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-header">
+                                    <div>
+                                        <div class="stat-value">€24,890</div>
+                                        <div class="stat-label">Parts Value</div>
+                                    </div>
+                                    <div class="stat-icon green">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M19 6h-3c-1.66 0-3 1.34-3 3v6c0 1.66 1.34 3 3 3h3"></path>
+                                    <line x1="15" y1="12" x2="21" y2="12"></line>
+                                    <line x1="15" y1="9" x2="20" y2="9"></line>
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="table-container" style="padding: 0;">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Part Details</th>
+                                        <th>Allocated To</th>
+                                        <th>Job ID</th>
+                                        <th>Quantity</th>
+                                        <th>Value</th>
+                                        <th>Date Allocated</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <div><strong>DLV-98472</strong></div>
+                                            <div style="font-size: 0.85rem; color: var(--text-secondary);">Pulsator Assembly</div>
+                                        </td>
+                                        <td>Murphy Farm Ltd</td>
+                                        <td><strong>#JOB-2847</strong></td>
+                                        <td>2 units</td>
+                                        <td>€398.00</td>
+                                        <td>Jan 28, 2025</td>
+                                        <td><span class="badge badge-success">Used</span></td>
+                                        <td>
+                                            <button class="btn btn-secondary btn-icon" title="View">View</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div><strong>DLV-82341</strong></div>
+                                            <div style="font-size: 0.85rem; color: var(--text-secondary);">Vacuum Pump</div>
+                                        </td>
+                                        <td>O'Sullivan Dairy</td>
+                                        <td><strong>#JOB-2846</strong></td>
+                                        <td>1 unit</td>
+                                        <td>€945.00</td>
+                                        <td>Jan 27, 2025</td>
+                                        <td><span class="badge badge-warning">Reserved</span></td>
+                                        <td>
+                                            <button class="btn btn-secondary btn-icon" title="Release">X</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div><strong>DLV-73829</strong></div>
+                                            <div style="font-size: 0.85rem; color: var(--text-secondary);">Liner Set (4pc)</div>
+                                        </td>
+                                        <td>Kelly Cattle Co</td>
+                                        <td><strong>#JOB-2845</strong></td>
+                                        <td>4 units</td>
+                                        <td>€168.00</td>
+                                        <td>Jan 26, 2025</td>
+                                        <td><span class="badge badge-success">Used</span></td>
+                                        <td>
+                                            <button class="btn btn-secondary btn-icon" title="View">View</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Invoices View -->
+            <div id="invoices-view" class="view-content" style="display: none;">
+                <div class="section-card">
+                    <div class="section-header">
+                        <h2 class="section-title">Invoices & Monthly Billing</h2>
+                        <div class="section-actions">
+                            <button class="btn btn-secondary">
+                                Export
+                            </button>
+                            <button class="btn btn-primary" onclick="openModal('generateInvoice')">
+                                + Generate Invoice
+                            </button>
+                        </div>
+                    </div>
+
+                    <div style="padding: 2rem;">
+                        <div class="dashboard-grid" style="margin-bottom: 2rem;">
+                            <div class="stat-card">
+                                <div class="stat-header">
+                                    <div>
+                                        <div class="stat-value">€42,850</div>
+                                        <div class="stat-label">Total Outstanding</div>
+                                    </div>
+                                    <div class="stat-icon blue">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M19 6h-3c-1.66 0-3 1.34-3 3v6c0 1.66 1.34 3 3 3h3"></path>
+                                    <line x1="15" y1="12" x2="21" y2="12"></line>
+                                    <line x1="15" y1="9" x2="20" y2="9"></line>
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-header">
+                                    <div>
+                                        <div class="stat-value">€18,200</div>
+                                        <div class="stat-label">Overdue</div>
+                                        <div class="stat-change negative">12 invoices</div>
+                                    </div>
+                                    <div class="stat-icon red">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                                            <line x1="12" y1="9" x2="12" y2="13"></line>
+                                            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-header">
+                                    <div>
+                                        <div class="stat-value">€24,650</div>
+                                        <div class="stat-label">Paid This Month</div>
+                                    </div>
+                                    <div class="stat-icon green">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polyline points="20 6 9 17 4 12"></polyline>
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="table-container" style="padding: 0;">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Invoice No.</th>
+                                        <th>Customer</th>
+                                        <th>Issue Date</th>
+                                        <th>Due Date</th>
+                                        <th>Jobs Included</th>
+                                        <th>Amount</th>
+                                        <th>Status</th>
+                                        <th>Payment</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>INV-2025-042</strong></td>
+                                        <td>Murphy Farm Ltd</td>
+                                        <td>Jan 31, 2025</td>
+                                        <td>Feb 28, 2025</td>
+                                        <td>6 jobs</td>
+                                        <td><strong>€4,280</strong></td>
+                                        <td><span class="badge badge-warning">Due</span></td>
+                                        <td>
+                                            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                                                <button class="btn-payment" onclick="markPayment('INV-2025-042', 50)" title="Mark as 50% Paid">50%</button>
+                                                <button class="btn-payment" onclick="markPayment('INV-2025-042', 100)" title="Mark as 100% Paid">100%</button>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-secondary btn-icon" title="Download PDF" onclick="generateInvoicePDFFromTable('INV-2025-042', 'Murphy Farm Ltd', '€4,280', 'Jan 31, 2025')">PDF</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>INV-2025-041</strong></td>
+                                        <td>O'Sullivan Dairy</td>
+                                        <td>Jan 31, 2025</td>
+                                        <td>Feb 28, 2025</td>
+                                        <td>3 jobs</td>
+                                        <td><strong>€2,150</strong></td>
+                                        <td><span class="badge badge-warning">Due</span></td>
+                                        <td>
+                                            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                                                <button class="btn-payment" onclick="markPayment('INV-2025-041', 50)" title="Mark as 50% Paid">50%</button>
+                                                <button class="btn-payment" onclick="markPayment('INV-2025-041', 100)" title="Mark as 100% Paid">100%</button>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-secondary btn-icon" title="Download PDF" onclick="generateInvoicePDFFromTable('INV-2025-041', 'O\'Sullivan Dairy', '€2,150', 'Jan 31, 2025')">PDF</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>INV-2025-040</strong></td>
+                                        <td>Byrne Dairy Farm</td>
+                                        <td>Dec 31, 2024</td>
+                                        <td style="color: var(--error-red); font-weight: 600;">Jan 31, 2025</td>
+                                        <td>8 jobs</td>
+                                        <td><strong>€8,420</strong></td>
+                                        <td><span class="badge badge-danger">Overdue</span></td>
+                                        <td>
+                                            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                                                <button class="btn-payment" onclick="markPayment('INV-2025-040', 50)" title="Mark as 50% Paid">50%</button>
+                                                <button class="btn-payment" onclick="markPayment('INV-2025-040', 100)" title="Mark as 100% Paid">100%</button>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-secondary btn-icon" title="Download PDF" onclick="generateInvoicePDFFromTable('INV-2025-040', 'Byrne Dairy Farm', '€8,420', 'Dec 31, 2024')">PDF</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quotes View -->
+            <div id="quotes-view" class="view-content" style="display: none;">
+                <div class="section-card">
+                    <div class="section-header">
+                        <h2 class="section-title">Quotes & Estimates</h2>
+                        <div class="section-actions">
+                            <button class="btn btn-primary" onclick="openModal('newQuote')">
+                                + Create Quote
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Quote No.</th>
+                                    <th>Customer</th>
+                                    <th>Description</th>
+                                    <th>Date</th>
+                                    <th>Valid Until</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>QT-2025-128</strong></td>
+                                    <td>Walsh Dairy</td>
+                                    <td>Complete Milking System Upgrade</td>
+                                    <td>Jan 29, 2025</td>
+                                    <td>Feb 28, 2025</td>
+                                    <td><strong>€18,500</strong></td>
+                                    <td><span class="badge badge-warning">Pending</span></td>
+                                    <td>
+                                        <button class="btn btn-secondary btn-icon" title="Download Quote PDF" onclick="generateQuotePDF('QT-2025-128', 'Walsh Dairy')">PDF</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>QT-2025-127</strong></td>
+                                    <td>McCarthy Farm</td>
+                                    <td>Annual Service Package</td>
+                                    <td>Jan 25, 2025</td>
+                                    <td>Feb 25, 2025</td>
+                                    <td><strong>€3,200</strong></td>
+                                    <td><span class="badge badge-success">Accepted</span></td>
+                                    <td>
+                                        <button class="btn btn-secondary btn-icon" title="Download Quote PDF" onclick="generateQuotePDF('QT-2025-127', 'McCarthy Farm')" style="margin-right: 0.5rem;">PDF</button>
+                                        <button class="btn btn-success btn-icon" title="Convert to Job">Convert</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payments View -->
+            <div id="payments-view" class="view-content" style="display: none;">
+                <div class="section-card">
+                    <div class="section-header">
+                        <h2 class="section-title">Payment Records</h2>
+                        <div class="section-actions">
+                            <button class="btn btn-primary">
+                                + Record Payment
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Payment ID</th>
+                                    <th>Customer</th>
+                                    <th>Invoice</th>
+                                    <th>Date</th>
+                                    <th>Method</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>PAY-2025-198</strong></td>
+                                    <td>Kelly Cattle Co</td>
+                                    <td>INV-2025-039</td>
+                                    <td>Jan 28, 2025</td>
+                                    <td>Bank Transfer</td>
+                                    <td><strong>€2,840</strong></td>
+                                    <td><span class="badge badge-success">Cleared</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>PAY-2025-197</strong></td>
+                                    <td>Murphy Farm Ltd</td>
+                                    <td>INV-2025-038</td>
+                                    <td>Jan 26, 2025</td>
+                                    <td>Cheque</td>
+                                    <td><strong>€3,650</strong></td>
+                                    <td><span class="badge badge-warning">Pending</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reports View -->
+            <div id="reports-view" class="view-content" style="display: none;">
+                <div class="section-card">
+                    <div class="section-header">
+                        <h2 class="section-title">Analytics & Reports</h2>
+                    </div>
+
+                    <div style="padding: 2rem;">
+                        <div class="dashboard-grid">
+                            <div class="quick-action-card">
+                                <div class="quick-action-icon">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M19 6h-3c-1.66 0-3 1.34-3 3v6c0 1.66 1.34 3 3 3h3"></path>
+                                    <line x1="15" y1="12" x2="21" y2="12"></line>
+                                    <line x1="15" y1="9" x2="20" y2="9"></line>
+                                    </svg>
+                                </div>
+                                <div class="quick-action-title">Revenue Report</div>
+                                <div class="quick-action-desc">Monthly & annual revenue analysis</div>
+                            </div>
+                            <div class="quick-action-card">
+                                <div class="quick-action-icon">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                                    </svg>
+                                </div>
+                                <div class="quick-action-title">Parts Usage</div>
+                                <div class="quick-action-desc">Inventory turnover & trends</div>
+                            </div>
+                            <div class="quick-action-card">
+                                <div class="quick-action-icon">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="9" cy="7" r="4"></circle>
+                                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                    </svg>
+                                </div>
+                                <div class="quick-action-title">Customer Spend</div>
+                                <div class="quick-action-desc">Top customers & loyalty</div>
+                            </div>
+                            <div class="quick-action-card">
+                                <div class="quick-action-icon">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
+                                    </svg>
+                                </div>
+                                <div class="quick-action-title">Engineer Performance</div>
+                                <div class="quick-action-desc">Job completion & efficiency</div>
+                            </div>
+                            <div class="quick-action-card">
+                                <div class="quick-action-icon">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                                        <line x1="12" y1="9" x2="12" y2="13"></line>
+                                        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                                    </svg>
+                                </div>
+                                <div class="quick-action-title">Overdue Accounts</div>
+                                <div class="quick-action-desc">Outstanding debtors report</div>
+                            </div>
+                            <div class="quick-action-card">
+                                <div class="quick-action-icon">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <line x1="18" y1="20" x2="18" y2="10"></line>
+                                        <line x1="12" y1="20" x2="12" y2="4"></line>
+                                        <line x1="6" y1="20" x2="6" y2="14"></line>
+                                    </svg>
+                                </div>
+                                <div class="quick-action-title">Custom Report</div>
+                                <div class="quick-action-desc">Build your own analytics</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <!-- New Job Modal -->
+    <div id="newJob" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">Create New Job</h2>
+                <button class="modal-close" onclick="closeModal('newJob')">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Customer *</label>
+                        <select class="form-select">
+                            <option>Select customer...</option>
+                            <option>Murphy Farm Ltd</option>
+                            <option>O'Sullivan Dairy</option>
+                            <option>Kelly Cattle Co</option>
+                            <option>Byrne Dairy Farm</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Job Type *</label>
+                        <select class="form-select">
+                            <option>Select type...</option>
+                            <option>Service Call</option>
+                            <option>Repair</option>
+                            <option>Installation</option>
+                            <option>Annual Inspection</option>
+                            <option>Emergency</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Assign Engineer *</label>
+                        <select class="form-select">
+                            <option>Select engineer...</option>
+                            <option>Pat O'Brien</option>
+                            <option>Sean Murphy</option>
+                            <option>Michael Flynn</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Scheduled Date *</label>
+                        <input type="date" class="form-input">
+                    </div>
+                    <div class="form-group" style="grid-column: 1 / -1;">
+                        <label class="form-label">Job Description</label>
+                        <textarea class="form-textarea" placeholder="Describe the work to be done..."></textarea>
+                    </div>
+                    <div class="form-group" style="grid-column: 1 / -1;">
+                        <label class="form-label">Special Instructions</label>
+                        <textarea class="form-textarea" placeholder="Any special notes or requirements..."></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('newJob')">Cancel</button>
+                <button class="btn btn-primary">Create Job</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Customer Modal -->
+    <div id="newCustomer" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">Add New Customer</h2>
+                <button class="modal-close" onclick="closeModal('newCustomer')">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Farm/Business Name *</label>
+                        <input type="text" class="form-input" placeholder="e.g. Murphy Farm Ltd">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Contact Person *</label>
+                        <input type="text" class="form-input" placeholder="e.g. John Murphy">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email *</label>
+                        <input type="email" class="form-input" placeholder="email@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Phone *</label>
+                        <input type="tel" class="form-input" placeholder="+353...">
+                    </div>
+                    <div class="form-group" style="grid-column: 1 / -1;">
+                        <label class="form-label">Address *</label>
+                        <input type="text" class="form-input" placeholder="Street address">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Town *</label>
+                        <input type="text" class="form-input" placeholder="e.g. Mitchelstown">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">County *</label>
+                        <input type="text" class="form-input" placeholder="e.g. Co. Cork">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Payment Terms</label>
+                        <select class="form-select">
+                            <option>30 Days</option>
+                            <option>14 Days</option>
+                            <option>60 Days</option>
+                            <option>Due on Receipt</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Credit Limit</label>
+                        <input type="number" class="form-input" placeholder="€">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('newCustomer')">Cancel</button>
+                <button class="btn btn-primary">Add Customer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Quote Modal -->
+    <div id="newQuote" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">Create Quote</h2>
+                <button class="modal-close" onclick="closeModal('newQuote')">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Customer *</label>
+                        <select class="form-select">
+                            <option>Select customer...</option>
+                            <option>Murphy Farm Ltd</option>
+                            <option>Walsh Dairy</option>
+                            <option>McCarthy Farm</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Valid Until *</label>
+                        <input type="date" class="form-input">
+                    </div>
+                    <div class="form-group" style="grid-column: 1 / -1;">
+                        <label class="form-label">Description *</label>
+                        <input type="text" class="form-input" placeholder="e.g. Complete Milking System Upgrade">
+                    </div>
+                    <div class="form-group" style="grid-column: 1 / -1;">
+                        <label class="form-label">Quote Details</label>
+                        <textarea class="form-textarea" placeholder="List items, parts, and labour..."></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('newQuote')">Cancel</button>
+                <button class="btn btn-primary">Create Quote</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Generate Invoice Modal -->
+    <div id="generateInvoice" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">Generate Monthly Invoice</h2>
+                <button class="modal-close" onclick="closeModal('generateInvoice')">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Customer Account *</label>
+                        <select class="form-select">
+                            <option>Select customer...</option>
+                            <option>Murphy Farm Ltd (6 jobs pending)</option>
+                            <option>O'Sullivan Dairy (3 jobs pending)</option>
+                            <option>Byrne Dairy Farm (8 jobs pending)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Invoice Period *</label>
+                        <select class="form-select">
+                            <option>January 2025</option>
+                            <option>December 2024</option>
+                            <option>November 2024</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="grid-column: 1 / -1;">
+                        <div style="padding: 1.5rem; background: var(--delaval-light-blue); border-radius: 10px; border-left: 4px solid var(--delaval-blue);">
+                            <strong style="color: var(--delaval-blue);">Preview:</strong>
+                            <div style="margin-top: 0.75rem; font-size: 0.9rem; color: var(--text-primary);">
+                                This invoice will include all completed jobs and parts used during the selected period. The customer will receive a consolidated PDF statement.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('generateInvoice')">Cancel</button>
+                <button class="btn btn-primary" onclick="generateMonthlyInvoicePDF()">Generate & Download PDF</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- One-Time Invoice Modal -->
+    <div id="oneTimeInvoice" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">One-Time Invoice</h2>
+                <button class="modal-close" onclick="closeModal('oneTimeInvoice')">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Customer Name *</label>
+                        <input type="text" class="form-input" id="oneTimeCustomerName" placeholder="e.g. John Murphy" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Contact Email</label>
+                        <input type="email" class="form-input" id="oneTimeEmail" placeholder="email@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Phone</label>
+                        <input type="tel" class="form-input" id="oneTimePhone" placeholder="+353...">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Invoice Date *</label>
+                        <input type="date" class="form-input" id="oneTimeDate" required>
+                    </div>
+                    <div class="form-group" style="grid-column: 1 / -1;">
+                        <label class="form-label">Description *</label>
+                        <textarea class="form-textarea" id="oneTimeDescription" placeholder="Service description..." required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Labour Hours</label>
+                        <input type="number" class="form-input" id="oneTimeLabourHours" placeholder="0" min="0" step="0.5">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Labour Rate (€/hour)</label>
+                        <input type="number" class="form-input" id="oneTimeLabourRate" placeholder="60" min="0" value="60">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Parts Cost (€)</label>
+                        <input type="number" class="form-input" id="oneTimePartsCost" placeholder="0.00" min="0" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Additional Charges (€)</label>
+                        <input type="number" class="form-input" id="oneTimeAdditional" placeholder="0.00" min="0" step="0.01">
+                    </div>
+                    <div class="form-group" style="grid-column: 1 / -1;">
+                        <div style="padding: 1.5rem; background: var(--delaval-light-blue); border-radius: 10px; border-left: 4px solid var(--delaval-blue);">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <strong style="color: var(--delaval-blue); font-size: 1.1rem;">Total Amount:</strong>
+                                <strong id="oneTimeTotal" style="color: var(--delaval-blue); font-size: 1.5rem;">€0.00</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('oneTimeInvoice')">Cancel</button>
+                <button class="btn btn-primary" onclick="generateOneTimeInvoicePDF()">Generate & Download PDF</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Menu Toggle -->
+    <button class="mobile-menu-toggle" onclick="toggleMobileMenu()" aria-label="Toggle Menu">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+    </button>
+
+    <script>
+        // Mobile Menu Toggle
+        function toggleMobileMenu() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.querySelector('.sidebar-overlay');
+            
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+
+        // Close mobile menu when nav item is clicked
+        function closeMobileMenu() {
+            if (window.innerWidth <= 1024) {
+                const sidebar = document.getElementById('sidebar');
+                const overlay = document.querySelector('.sidebar-overlay');
+                sidebar.classList.remove('active');
+                overlay.classList.remove('active');
+            }
+        }
+
+        // View Management
+        function showView(viewName) {
+            // Hide all views
+            const views = document.querySelectorAll('.view-content');
+            views.forEach(view => view.style.display = 'none');
+            
+            // Show selected view
+            const selectedView = document.getElementById(viewName + '-view');
+            if (selectedView) {
+                selectedView.style.display = 'block';
+            }
+            
+            // Update nav items - remove active from all first
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => item.classList.remove('active'));
+            
+            // Add active to clicked item by finding it through the onclick attribute
+            navItems.forEach(item => {
+                const onclickAttr = item.getAttribute('onclick');
+                if (onclickAttr && onclickAttr.includes(viewName)) {
+                    item.classList.add('active');
+                }
+            });
+
+            // Close mobile menu after navigation
+            closeMobileMenu();
+
+            // Scroll to top on mobile
+            if (window.innerWidth <= 1024) {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        // Modal Management
+        function openModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.add('active');
+                document.body.style.overflow = 'hidden'; // Prevent background scroll
+            }
+        }
+
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.remove('active');
+                document.body.style.overflow = ''; // Restore scroll
+            }
+        }
+
+        // Close modal on overlay click
+        document.querySelectorAll('.modal-overlay').forEach(overlay => {
+            overlay.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
+            });
+        });
+
+        // Close modal on escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const activeModal = document.querySelector('.modal-overlay.active');
+                if (activeModal) {
+                    activeModal.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
+            }
+        });
+
+        // Tab Management
+        function switchTab(event, tabName) {
+            // Get the section card that contains these tabs
+            const sectionCard = event.currentTarget.closest('.section-card');
+            
+            // Hide all tab contents in this section
+            const tabContents = sectionCard.querySelectorAll('.tab-content');
+            tabContents.forEach(content => content.classList.remove('active'));
+            
+            // Remove active class from all tabs in this section
+            const tabs = sectionCard.querySelectorAll('.tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            // Show selected tab content
+            const selectedContent = document.getElementById(tabName);
+            if (selectedContent) {
+                selectedContent.classList.add('active');
+            }
+            
+            // Add active class to clicked tab
+            event.currentTarget.classList.add('active');
+        }
+
+        // Search functionality
+        function setupSearch() {
+            const searchInputs = document.querySelectorAll('.search-input');
+            searchInputs.forEach(input => {
+                input.addEventListener('input', function(e) {
+                    const searchTerm = e.target.value.toLowerCase();
+                    const table = e.target.closest('.section-card, [style*="padding"]').querySelector('table');
+                    
+                    if (table) {
+                        const rows = table.querySelectorAll('tbody tr');
+                        rows.forEach(row => {
+                            const text = row.textContent.toLowerCase();
+                            if (text.includes(searchTerm)) {
+                                row.style.display = '';
+                            } else {
+                                row.style.display = 'none';
+                            }
+                        });
+                    }
+                    
+                    // Also search in customer cards
+                    const customerCards = e.target.closest('[style*="padding"]')?.querySelectorAll('.stat-card');
+                    if (customerCards) {
+                        customerCards.forEach(card => {
+                            const text = card.textContent.toLowerCase();
+                            if (text.includes(searchTerm)) {
+                                card.style.display = '';
+                            } else {
+                                card.style.display = 'none';
+                            }
+                        });
+                    }
+                });
+            });
+        }
+
+        // Form validation
+        function validateForm(formElement) {
+            const requiredFields = formElement.querySelectorAll('[required], .form-input, .form-select');
+            let isValid = true;
+            
+            requiredFields.forEach(field => {
+                if (field.hasAttribute('required') && !field.value.trim()) {
+                    field.style.borderColor = 'var(--error-red)';
+                    isValid = false;
+                } else {
+                    field.style.borderColor = 'var(--border-color)';
+                }
+            });
+            
+            return isValid;
+        }
+
+        // Add form submit handlers
+        function setupFormSubmits() {
+            const modalForms = document.querySelectorAll('.modal');
+            modalForms.forEach(modal => {
+                const primaryBtn = modal.querySelector('.btn-primary:not(.modal-close)');
+                if (primaryBtn) {
+                    primaryBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const form = modal.querySelector('.form-grid');
+                        
+                        if (form) {
+                            // Simulate form submission
+                            const modalId = modal.closest('.modal-overlay').id;
+                            console.log(`Submitting form for: ${modalId}`);
+                            
+                            // Show success message
+                            showNotification('Success!', 'Data saved successfully', 'success');
+                            
+                            // Close modal
+                            closeModal(modalId);
+                            
+                            // In production, this would be an API call
+                        }
+                    });
+                }
+            });
+        }
+
+        // Notification system
+        function showNotification(title, message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 100px;
+                right: 20px;
+                background: white;
+                padding: 1.5rem;
+                border-radius: 12px;
+                box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+                z-index: 3000;
+                min-width: 300px;
+                border-left: 4px solid ${type === 'success' ? 'var(--success-green)' : 'var(--delaval-blue)'};
+                animation: slideInRight 0.3s ease;
+            `;
+            
+            notification.innerHTML = `
+                <div style="display: flex; align-items: start; gap: 1rem;">
+                    <div style="font-size: 1.5rem;">${type === 'success' ? '✓' : 'i'}</div>
+                    <div style="flex: 1;">
+                        <div style="font-weight: 700; margin-bottom: 0.25rem;">${title}</div>
+                        <div style="font-size: 0.9rem; color: var(--text-secondary);">${message}</div>
+                    </div>
+                    <button onclick="this.parentElement.parentElement.remove()" style="border: none; background: none; font-size: 1.5rem; cursor: pointer; color: var(--text-secondary);">×</button>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Auto remove after 4 seconds
+            setTimeout(() => {
+                notification.style.animation = 'slideOutRight 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
+            }, 4000);
+        }
+
+        // Add notification animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideInRight {
+                from {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            @keyframes slideOutRight {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Simulate some dynamic data updates
+        function updateDashboardStats() {
+            // This would connect to your backend in production
+            console.log('Dashboard stats updated');
+            
+            // Simulate data updates
+            setInterval(() => {
+                const statValues = document.querySelectorAll('.stat-value');
+                statValues.forEach(stat => {
+                    // Add subtle pulse animation to show data is live
+                    stat.style.animation = 'none';
+                    setTimeout(() => {
+                        stat.style.animation = 'pulse 0.3s ease';
+                    }, 10);
+                });
+            }, 30000); // Every 30 seconds
+        }
+
+        // Add pulse animation
+        const pulseStyle = document.createElement('style');
+        pulseStyle.textContent = `
+            @keyframes pulse {
+                0%, 100% { transform: scale(1); }
+                50% { transform: scale(1.05); }
+            }
+        `;
+        document.head.appendChild(pulseStyle);
+
+        // View detail functions for tables
+        function viewJobDetails(jobId) {
+            showNotification('Job Details', `Opening details for ${jobId}`, 'info');
+            // In production, this would open a detailed view
+        }
+
+        function viewCustomerDetails(customerId) {
+            showNotification('Customer Details', `Opening account for ${customerId}`, 'info');
+            // In production, this would open customer detail page
+        }
+
+        // Open Customer Account Detail View
+        function openCustomerAccount(customerName, customerId) {
+            // Sample customer data - in production this would come from database
+            const customerData = {
+                'murphy-farm': {
+                    name: 'Murphy Farm Ltd',
+                    initials: 'MF',
+                    location: 'Mitchelstown, Co. Cork',
+                    contact: 'John Murphy',
+                    email: 'john@murphyfarm.ie',
+                    phone: '+353 25 84234',
+                    balance: '€4,280',
+                    totalJobs: 24,
+                    totalRevenue: '€28,450',
+                    partsPurchased: '€8,340'
+                },
+                'osullivan-dairy': {
+                    name: "O'Sullivan Dairy",
+                    initials: 'OD',
+                    location: 'Fermoy, Co. Cork',
+                    contact: 'Michael O\'Sullivan',
+                    email: 'michael@osullivandairy.ie',
+                    phone: '+353 25 31156',
+                    balance: '€2,150',
+                    totalJobs: 18,
+                    totalRevenue: '€19,300',
+                    partsPurchased: '€5,890'
+                },
+                'kelly-cattle': {
+                    name: 'Kelly Cattle Co',
+                    initials: 'KC',
+                    location: 'Mallow, Co. Cork',
+                    contact: 'Patrick Kelly',
+                    email: 'pat@kellycattle.ie',
+                    phone: '+353 22 21445',
+                    balance: '€0',
+                    totalJobs: 32,
+                    totalRevenue: '€42,100',
+                    partsPurchased: '€12,450'
+                },
+                'byrne-dairy': {
+                    name: 'Byrne Dairy Farm',
+                    initials: 'BD',
+                    location: 'Charleville, Co. Cork',
+                    contact: 'Tom Byrne',
+                    email: 'tom@byrnedairy.ie',
+                    phone: '+353 63 81223',
+                    balance: '€8,420',
+                    totalJobs: 15,
+                    totalRevenue: '€31,200',
+                    partsPurchased: '€9,870'
+                }
+            };
+
+            const customer = customerData[customerId];
+            
+            if (!customer) {
+                showNotification('Error', 'Customer data not found', 'info');
+                return;
+            }
+
+            // Update customer header
+            const avatar = document.querySelector('#customer-account-view .customer-avatar');
+            if (avatar) avatar.textContent = customer.initials;
+            
+            const nameElement = document.getElementById('customerAccountName');
+            if (nameElement) nameElement.textContent = customer.name;
+            
+            // Update customer info
+            const infoSection = document.querySelector('#customer-account-view .section-card');
+            if (infoSection) {
+                const contactInfo = infoSection.querySelector('[style*="color: var(--text-secondary)"]');
+                if (contactInfo) {
+                    contactInfo.innerHTML = `
+                        <div>${customer.location}</div>
+                        <div>Contact: ${customer.contact}</div>
+                        <div>Email: ${customer.email} | Phone: ${customer.phone}</div>
+                    `;
+                }
+            }
+
+            const balanceElement = document.getElementById('customerBalance');
+            if (balanceElement) balanceElement.textContent = customer.balance;
+
+            // Update stats
+            const statCards = document.querySelectorAll('#customer-account-view .stat-card');
+            if (statCards[0]) {
+                const jobValue = statCards[0].querySelector('.stat-value');
+                if (jobValue) jobValue.textContent = customer.totalJobs;
+            }
+            if (statCards[1]) {
+                const revenueValue = statCards[1].querySelector('.stat-value');
+                if (revenueValue) revenueValue.textContent = customer.totalRevenue;
+            }
+            if (statCards[2]) {
+                const partsValue = statCards[2].querySelector('.stat-value');
+                if (partsValue) partsValue.textContent = customer.partsPurchased;
+            }
+
+            // Hide all views and show customer account view
+            const views = document.querySelectorAll('.view-content');
+            views.forEach(view => view.style.display = 'none');
+            
+            const customerAccountView = document.getElementById('customer-account-view');
+            if (customerAccountView) {
+                customerAccountView.style.display = 'block';
+            }
+
+            // Update nav
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => item.classList.remove('active'));
+
+            // Close mobile menu if open
+            closeMobileMenu();
+
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            showNotification('Customer Account', `Viewing ${customer.name}`, 'info');
+        }
+
+        // Mark invoice payment status
+        function markPayment(invoiceId, percentage) {
+            // Find the invoice row
+            const rows = document.querySelectorAll('tbody tr');
+            let invoiceRow = null;
+            
+            rows.forEach(row => {
+                const invoiceCell = row.querySelector('strong');
+                if (invoiceCell && invoiceCell.textContent === invoiceId) {
+                    invoiceRow = row;
+                }
+            });
+            
+            if (!invoiceRow) return;
+            
+            // Get the amount
+            const amountCell = invoiceRow.querySelectorAll('td')[5];
+            const amountText = amountCell.textContent.trim();
+            const amount = parseFloat(amountText.replace('€', '').replace(',', ''));
+            
+            // Update status badge
+            const statusCell = invoiceRow.querySelectorAll('td')[6];
+            const badge = statusCell.querySelector('.badge');
+            
+            // Update payment buttons
+            const paymentCell = invoiceRow.querySelectorAll('td')[7];
+            const buttons = paymentCell.querySelectorAll('.btn-payment');
+            
+            // Remove existing active states
+            buttons.forEach(btn => {
+                btn.classList.remove('paid-50', 'paid-100');
+            });
+            
+            if (percentage === 50) {
+                badge.className = 'badge badge-warning';
+                badge.textContent = '50% Paid';
+                buttons[0].classList.add('paid-50');
+                showNotification('Payment Updated', `${invoiceId} marked as 50% paid (€${(amount/2).toFixed(2)} received)`, 'success');
+            } else if (percentage === 100) {
+                badge.className = 'badge badge-success';
+                badge.textContent = 'Paid';
+                buttons[1].classList.add('paid-100');
+                showNotification('Payment Complete', `${invoiceId} marked as fully paid (€${amount.toFixed(2)})`, 'success');
+                
+                // Update outstanding balance in stats
+                updateOutstandingBalance(-amount);
+            }
+            
+            // In production, this would make an API call to update the database
+        }
+
+        // Update outstanding balance
+        function updateOutstandingBalance(change) {
+            const statCards = document.querySelectorAll('.stat-card');
+            statCards.forEach(card => {
+                const label = card.querySelector('.stat-label');
+                if (label && label.textContent === 'Total Outstanding') {
+                    const valueElement = card.querySelector('.stat-value');
+                    const currentValue = parseFloat(valueElement.textContent.replace('€', '').replace(',', ''));
+                    const newValue = currentValue + change;
+                    valueElement.textContent = `€${newValue.toFixed(0).toLocaleString()}`;
+                }
+            });
+        }
+
+        // Export functions
+        function exportData(dataType) {
+            showNotification('Export Started', `Exporting ${dataType} data...`, 'info');
+            // In production, this would generate and download CSV/Excel
+        }
+
+        // One-Time Invoice Calculations
+        function calculateOneTimeTotal() {
+            const labourHours = parseFloat(document.getElementById('oneTimeLabourHours')?.value || 0);
+            const labourRate = parseFloat(document.getElementById('oneTimeLabourRate')?.value || 60);
+            const partsCost = parseFloat(document.getElementById('oneTimePartsCost')?.value || 0);
+            const additional = parseFloat(document.getElementById('oneTimeAdditional')?.value || 0);
+            
+            const total = (labourHours * labourRate) + partsCost + additional;
+            
+            const totalElement = document.getElementById('oneTimeTotal');
+            if (totalElement) {
+                totalElement.textContent = `€${total.toFixed(2)}`;
+            }
+        }
+
+        // Generate PDF for One-Time Invoice
+        function generateOneTimeInvoicePDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // Get form values
+            const customerName = document.getElementById('oneTimeCustomerName').value;
+            const email = document.getElementById('oneTimeEmail').value;
+            const phone = document.getElementById('oneTimePhone').value;
+            const date = document.getElementById('oneTimeDate').value;
+            const description = document.getElementById('oneTimeDescription').value;
+            const labourHours = parseFloat(document.getElementById('oneTimeLabourHours').value || 0);
+            const labourRate = parseFloat(document.getElementById('oneTimeLabourRate').value || 60);
+            const partsCost = parseFloat(document.getElementById('oneTimePartsCost').value || 0);
+            const additional = parseFloat(document.getElementById('oneTimeAdditional').value || 0);
+            
+            if (!customerName || !date || !description) {
+                showNotification('Missing Information', 'Please fill in all required fields', 'info');
+                return;
+            }
+            
+            const labourTotal = labourHours * labourRate;
+            const total = labourTotal + partsCost + additional;
+            const invoiceNumber = `INV-${new Date().getFullYear()}-${Math.floor(Math.random() * 1000)}`;
+            
+            // DeLaval Blue Header
+            doc.setFillColor(0, 81, 165);
+            doc.rect(0, 0, 210, 40, 'F');
+            
+            // Company Name
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(24);
+            doc.setFont(undefined, 'bold');
+            doc.text('Condon Dairy Services', 20, 20);
+            
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'normal');
+            doc.text('Powered by DeLaval Technology', 20, 28);
+            
+            // Invoice Title
+            doc.setTextColor(0, 0, 0);
+            doc.setFontSize(20);
+            doc.setFont(undefined, 'bold');
+            doc.text('INVOICE', 150, 20);
+            
+            // Invoice Number and Date
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'normal');
+            doc.text(`Invoice #: ${invoiceNumber}`, 150, 28);
+            doc.text(`Date: ${date}`, 150, 34);
+            
+            // Customer Details
+            doc.setFontSize(12);
+            doc.setFont(undefined, 'bold');
+            doc.text('Bill To:', 20, 55);
+            
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'normal');
+            doc.text(customerName, 20, 62);
+            if (email) doc.text(email, 20, 68);
+            if (phone) doc.text(phone, 20, 74);
+            
+            // Description
+            doc.setFontSize(12);
+            doc.setFont(undefined, 'bold');
+            doc.text('Description:', 20, 90);
+            
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'normal');
+            const splitDescription = doc.splitTextToSize(description, 170);
+            doc.text(splitDescription, 20, 97);
+            
+            // Line Items Table
+            let yPos = 120;
+            
+            // Table Header
+            doc.setFillColor(230, 240, 255);
+            doc.rect(20, yPos, 170, 10, 'F');
+            
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'bold');
+            doc.text('Item', 25, yPos + 7);
+            doc.text('Quantity', 100, yPos + 7);
+            doc.text('Rate', 130, yPos + 7);
+            doc.text('Amount', 160, yPos + 7);
+            
+            yPos += 10;
+            
+            // Labour
+            if (labourHours > 0) {
+                doc.setFont(undefined, 'normal');
+                doc.text('Labour', 25, yPos + 7);
+                doc.text(`${labourHours} hrs`, 100, yPos + 7);
+                doc.text(`€${labourRate.toFixed(2)}`, 130, yPos + 7);
+                doc.text(`€${labourTotal.toFixed(2)}`, 160, yPos + 7);
+                yPos += 10;
+            }
+            
+            // Parts
+            if (partsCost > 0) {
+                doc.text('Parts & Materials', 25, yPos + 7);
+                doc.text('-', 100, yPos + 7);
+                doc.text('-', 130, yPos + 7);
+                doc.text(`€${partsCost.toFixed(2)}`, 160, yPos + 7);
+                yPos += 10;
+            }
+            
+            // Additional
+            if (additional > 0) {
+                doc.text('Additional Charges', 25, yPos + 7);
+                doc.text('-', 100, yPos + 7);
+                doc.text('-', 130, yPos + 7);
+                doc.text(`€${additional.toFixed(2)}`, 160, yPos + 7);
+                yPos += 10;
+            }
+            
+            // Total Line
+            yPos += 5;
+            doc.setLineWidth(0.5);
+            doc.line(130, yPos, 190, yPos);
+            
+            yPos += 10;
+            doc.setFontSize(14);
+            doc.setFont(undefined, 'bold');
+            doc.text('TOTAL:', 130, yPos);
+            doc.text(`€${total.toFixed(2)}`, 160, yPos);
+            
+            // Payment Terms
+            yPos += 20;
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'bold');
+            doc.text('Payment Terms:', 20, yPos);
+            doc.setFont(undefined, 'normal');
+            doc.text('Payment due within 30 days', 20, yPos + 7);
+            
+            // Footer
+            doc.setFontSize(8);
+            doc.setTextColor(100, 100, 100);
+            doc.text('Thank you for your business!', 105, 280, { align: 'center' });
+            doc.text('Condon Dairy Services - County Cork, Ireland', 105, 285, { align: 'center' });
+            
+            // Save the PDF
+            doc.save(`${invoiceNumber}_${customerName.replace(/\s+/g, '_')}.pdf`);
+            
+            closeModal('oneTimeInvoice');
+            showNotification('Invoice Generated', `PDF created successfully: ${invoiceNumber}`, 'success');
+        }
+
+        // Generate PDF for Monthly Invoice
+        function generateMonthlyInvoicePDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            const customerName = 'Murphy Farm Ltd'; // In production, get from form
+            const period = 'January 2025';
+            const invoiceNumber = `INV-${new Date().getFullYear()}-${Math.floor(Math.random() * 1000)}`;
+            const date = new Date().toLocaleDateString('en-IE');
+            
+            // Sample jobs data - in production, this would come from the database
+            const jobs = [
+                { id: 'JOB-2847', description: 'Milking System Service', parts: 845, labour: 3.5, rate: 60 },
+                { id: 'JOB-2843', description: 'Pump Replacement', parts: 420, labour: 2, rate: 60 },
+                { id: 'JOB-2839', description: 'Annual Inspection', parts: 150, labour: 1.5, rate: 60 },
+            ];
+            
+            let totalParts = 0;
+            let totalLabour = 0;
+            
+            jobs.forEach(job => {
+                totalParts += job.parts;
+                totalLabour += (job.labour * job.rate);
+            });
+            
+            const grandTotal = totalParts + totalLabour;
+            
+            // DeLaval Blue Header
+            doc.setFillColor(0, 81, 165);
+            doc.rect(0, 0, 210, 40, 'F');
+            
+            // Company Name
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(24);
+            doc.setFont(undefined, 'bold');
+            doc.text('Condon Dairy Services', 20, 20);
+            
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'normal');
+            doc.text('Monthly Statement - Powered by DeLaval', 20, 28);
+            
+            // Invoice Title
+            doc.setTextColor(0, 0, 0);
+            doc.setFontSize(20);
+            doc.setFont(undefined, 'bold');
+            doc.text('MONTHLY INVOICE', 140, 20);
+            
+            // Invoice Details
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'normal');
+            doc.text(`Invoice #: ${invoiceNumber}`, 140, 28);
+            doc.text(`Date: ${date}`, 140, 34);
+            
+            // Customer Details
+            doc.setFontSize(12);
+            doc.setFont(undefined, 'bold');
+            doc.text('Bill To:', 20, 55);
+            
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'normal');
+            doc.text(customerName, 20, 62);
+            doc.text(`Period: ${period}`, 20, 68);
+            
+            // Jobs Table
+            let yPos = 85;
+            
+            // Table Header
+            doc.setFillColor(230, 240, 255);
+            doc.rect(20, yPos, 170, 10, 'F');
+            
+            doc.setFontSize(9);
+            doc.setFont(undefined, 'bold');
+            doc.text('Job ID', 25, yPos + 7);
+            doc.text('Description', 55, yPos + 7);
+            doc.text('Parts', 120, yPos + 7);
+            doc.text('Labour', 145, yPos + 7);
+            doc.text('Total', 170, yPos + 7);
+            
+            yPos += 10;
+            
+            // Job Rows
+            doc.setFont(undefined, 'normal');
+            jobs.forEach(job => {
+                const jobTotal = job.parts + (job.labour * job.rate);
+                doc.text(job.id, 25, yPos + 7);
+                doc.text(job.description, 55, yPos + 7);
+                doc.text(`€${job.parts.toFixed(2)}`, 120, yPos + 7);
+                doc.text(`€${(job.labour * job.rate).toFixed(2)}`, 145, yPos + 7);
+                doc.text(`€${jobTotal.toFixed(2)}`, 170, yPos + 7);
+                yPos += 10;
+            });
+            
+            // Totals Section
+            yPos += 10;
+            doc.setLineWidth(0.5);
+            doc.line(120, yPos, 190, yPos);
+            
+            yPos += 10;
+            doc.setFont(undefined, 'bold');
+            doc.text('Parts Total:', 120, yPos);
+            doc.text(`€${totalParts.toFixed(2)}`, 170, yPos);
+            
+            yPos += 7;
+            doc.text('Labour Total:', 120, yPos);
+            doc.text(`€${totalLabour.toFixed(2)}`, 170, yPos);
+            
+            yPos += 10;
+            doc.setFontSize(12);
+            doc.text('GRAND TOTAL:', 120, yPos);
+            doc.text(`€${grandTotal.toFixed(2)}`, 170, yPos);
+            
+            // Payment Terms
+            yPos += 20;
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'bold');
+            doc.text('Payment Terms:', 20, yPos);
+            doc.setFont(undefined, 'normal');
+            doc.text('Payment due within 30 days from invoice date', 20, yPos + 7);
+            
+            // Footer
+            doc.setFontSize(8);
+            doc.setTextColor(100, 100, 100);
+            doc.text('Thank you for your continued business!', 105, 280, { align: 'center' });
+            doc.text('Condon Dairy Services - County Cork, Ireland', 105, 285, { align: 'center' });
+            
+            // Save the PDF
+            doc.save(`${invoiceNumber}_${customerName.replace(/\s+/g, '_')}_${period.replace(/\s+/g, '_')}.pdf`);
+            
+            closeModal('generateInvoice');
+            showNotification('Monthly Invoice Generated', `PDF created successfully: ${invoiceNumber}`, 'success');
+        }
+
+        // Generate PDF for Quote
+        function generateQuotePDF(quoteNumber, customerName) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // Similar structure to invoice but labeled as "QUOTE"
+            doc.setFillColor(0, 81, 165);
+            doc.rect(0, 0, 210, 40, 'F');
+            
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(24);
+            doc.setFont(undefined, 'bold');
+            doc.text('Condon Dairy Services', 20, 20);
+            
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'normal');
+            doc.text('Powered by DeLaval Technology', 20, 28);
+            
+            doc.setTextColor(0, 0, 0);
+            doc.setFontSize(20);
+            doc.setFont(undefined, 'bold');
+            doc.text('QUOTE', 160, 20);
+            
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'normal');
+            doc.text(`Quote #: ${quoteNumber}`, 150, 28);
+            doc.text(`Date: ${new Date().toLocaleDateString('en-IE')}`, 150, 34);
+            doc.text(`Valid Until: ${new Date(Date.now() + 30*24*60*60*1000).toLocaleDateString('en-IE')}`, 150, 40);
+            
+            // Customer info
+            doc.setFontSize(12);
+            doc.setFont(undefined, 'bold');
+            doc.text('Quote For:', 20, 55);
+            
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'normal');
+            doc.text(customerName, 20, 62);
+            
+            // Add quote items (sample data)
+            let yPos = 85;
+            doc.setFillColor(230, 240, 255);
+            doc.rect(20, yPos, 170, 10, 'F');
+            
+            doc.setFont(undefined, 'bold');
+            doc.text('Description', 25, yPos + 7);
+            doc.text('Amount', 170, yPos + 7);
+            
+            yPos += 15;
+            doc.setFont(undefined, 'normal');
+            doc.text('Complete Milking System Upgrade', 25, yPos);
+            doc.text('€18,500.00', 170, yPos);
+            
+            yPos += 20;
+            doc.setFontSize(12);
+            doc.setFont(undefined, 'bold');
+            doc.text('TOTAL:', 130, yPos);
+            doc.text('€18,500.00', 170, yPos);
+            
+            // Terms
+            yPos += 20;
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'bold');
+            doc.text('Terms & Conditions:', 20, yPos);
+            doc.setFont(undefined, 'normal');
+            doc.text('This quote is valid for 30 days from the date above.', 20, yPos + 7);
+            
+            doc.setFontSize(8);
+            doc.setTextColor(100, 100, 100);
+            doc.text('Thank you for considering Condon Dairy Services', 105, 280, { align: 'center' });
+            
+            doc.save(`${quoteNumber}_${customerName.replace(/\s+/g, '_')}.pdf`);
+            showNotification('Quote Generated', `PDF created successfully: ${quoteNumber}`, 'success');
+        }
+
+        // Generate PDF from existing invoice in table
+        function generateInvoicePDFFromTable(invoiceNumber, customerName, amount, date) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            const cleanAmount = parseFloat(amount.replace('€', '').replace(',', ''));
+            
+            // DeLaval Blue Header
+            doc.setFillColor(0, 81, 165);
+            doc.rect(0, 0, 210, 40, 'F');
+            
+            // Company Name
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(24);
+            doc.setFont(undefined, 'bold');
+            doc.text('Condon Dairy Services', 20, 20);
+            
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'normal');
+            doc.text('Monthly Statement - Powered by DeLaval', 20, 28);
+            
+            // Invoice Title
+            doc.setTextColor(0, 0, 0);
+            doc.setFontSize(20);
+            doc.setFont(undefined, 'bold');
+            doc.text('INVOICE', 155, 20);
+            
+            // Invoice Details
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'normal');
+            doc.text(`Invoice #: ${invoiceNumber}`, 145, 28);
+            doc.text(`Date: ${date}`, 145, 34);
+            
+            // Customer Details
+            doc.setFontSize(12);
+            doc.setFont(undefined, 'bold');
+            doc.text('Bill To:', 20, 55);
+            
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'normal');
+            doc.text(customerName, 20, 62);
+            
+            // Summary
+            doc.setFontSize(11);
+            doc.setFont(undefined, 'bold');
+            doc.text('Invoice Summary:', 20, 85);
+            
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'normal');
+            doc.text('This invoice includes all services and parts provided during the billing period.', 20, 92);
+            doc.text('Detailed breakdown available upon request.', 20, 99);
+            
+            // Amount Box
+            let yPos = 120;
+            doc.setFillColor(230, 240, 255);
+            doc.rect(20, yPos, 170, 30, 'F');
+            doc.setDrawColor(0, 81, 165);
+            doc.setLineWidth(1);
+            doc.rect(20, yPos, 170, 30);
+            
+            doc.setFontSize(14);
+            doc.setFont(undefined, 'bold');
+            doc.setTextColor(0, 81, 165);
+            doc.text('TOTAL AMOUNT DUE:', 30, yPos + 15);
+            
+            doc.setFontSize(20);
+            doc.text(amount, 160, yPos + 18);
+            
+            // Payment Terms
+            yPos = 170;
+            doc.setTextColor(0, 0, 0);
+            doc.setFontSize(11);
+            doc.setFont(undefined, 'bold');
+            doc.text('Payment Information:', 20, yPos);
+            
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'normal');
+            doc.text('Payment Terms: Net 30 Days', 20, yPos + 8);
+            doc.text('Payment Methods: Bank Transfer, Cheque', 20, yPos + 15);
+            doc.text('Please reference invoice number on payment', 20, yPos + 22);
+            
+            // Footer
+            doc.setFontSize(8);
+            doc.setTextColor(100, 100, 100);
+            doc.text('Thank you for your business!', 105, 275, { align: 'center' });
+            doc.text('Condon Dairy Services - County Cork, Ireland', 105, 280, { align: 'center' });
+            doc.text('For questions about this invoice, please contact us', 105, 285, { align: 'center' });
+            
+            // Save the PDF
+            doc.save(`${invoiceNumber}_${customerName.replace(/\s+/g, '_')}.pdf`);
+            
+            showNotification('Invoice PDF Downloaded', `${invoiceNumber} saved successfully`, 'success');
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Condon Dairy Services Management System initialized');
+            updateDashboardStats();
+            setupSearch();
+            setupFormSubmits();
+            
+            // Add click handlers to table view buttons
+            document.querySelectorAll('.btn-icon').forEach(btn => {
+                if (btn.title === 'View Details' || btn.title === 'View') {
+                    btn.addEventListener('click', function() {
+                        const row = this.closest('tr');
+                        const id = row.querySelector('strong')?.textContent;
+                        if (id) {
+                            viewJobDetails(id);
+                        }
+                    });
+                }
+            });
+            
+            // Add export handlers
+            document.querySelectorAll('.btn-secondary').forEach(btn => {
+                if (btn.textContent.includes('Export')) {
+                    btn.addEventListener('click', function() {
+                        const section = this.closest('.section-card');
+                        const title = section.querySelector('.section-title')?.textContent;
+                        exportData(title);
+                    });
+                }
+            });
+            
+            // Show welcome notification
+            setTimeout(() => {
+                showNotification('Welcome Back!', 'Condon Dairy Services Management System', 'success');
+            }, 500);
+
+            // Add event listeners for one-time invoice calculation
+            const oneTimeInputs = ['oneTimeLabourHours', 'oneTimeLabourRate', 'oneTimePartsCost', 'oneTimeAdditional'];
+            oneTimeInputs.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.addEventListener('input', calculateOneTimeTotal);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
