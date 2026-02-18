@@ -26,26 +26,13 @@ export function useProfiles() {
 
                 if (error) throw error;
 
-                if (error) throw error;
-
-                let formattedProfiles: Profile[] = [];
-
-                if (!data || data.length === 0) {
-                    console.log('No profiles found, using mock data for demo');
-                    formattedProfiles = [
-                        { id: 'mock-1', email: 'john@condondairy.com', full_name: 'John Condon', role: 'admin', initials: 'JC' },
-                        { id: 'mock-2', email: 'mike@condondairy.com', full_name: 'Mike Ryan', role: 'engineer', initials: 'MR' },
-                        { id: 'mock-3', email: 'sarah@condondairy.com', full_name: 'Sarah Connor', role: 'engineer', initials: 'SC' },
-                    ];
-                } else {
-                    formattedProfiles = data.map(p => ({
-                        id: p.id,
-                        email: p.email,
-                        full_name: p.full_name || p.email.split('@')[0], // Fallback to email prefix
-                        role: p.role || 'engineer',
-                        initials: (p.full_name || p.email).substring(0, 2).toUpperCase()
-                    }));
-                }
+                const formattedProfiles: Profile[] = (data || []).map(p => ({
+                    id: p.id,
+                    email: p.email || '',
+                    full_name: p.full_name || p.email?.split('@')[0] || 'Unknown',
+                    role: p.role || 'engineer',
+                    initials: (p.full_name || p.email || 'UN').substring(0, 2).toUpperCase()
+                }));
 
                 setProfiles(formattedProfiles);
             } catch (err: any) {

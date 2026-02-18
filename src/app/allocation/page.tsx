@@ -71,13 +71,7 @@ export default function AllocationPage() {
                 : j
         ));
 
-        // Check for Demo Mode (Mock IDs)
-        if (engineerId && engineerId.startsWith('mock-')) {
-            console.log("Demo Mode: Skipping DB update for mock profile.");
-            setAssigningId(null);
-            return; // Stop here, don't try to save to DB
-        }
-
+        // 2. Always persist to database
         try {
             const updates = engineerId ? { engineer_id: engineerId } : { engineer_id: null };
 
@@ -88,9 +82,8 @@ export default function AllocationPage() {
 
             if (error) throw error;
 
-            // Success - strictly we could refetch here to be sure, 
-            // but we already have correct state.
-            // await refetch(); 
+            // Refetch to confirm server state matches
+            await refetch();
 
         } catch (error: any) {
             console.error("Assignment failed:", error);
@@ -147,6 +140,12 @@ export default function AllocationPage() {
                             <UserButton />
                         </div>
                     </div>
+
+                    {engineers.length === 0 && (
+                        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 text-amber-800 text-sm">
+                            <strong>No engineers found.</strong> Please run the SQL script to populate the <code>profiles</code> table in Supabase.
+                        </div>
+                    )}
 
                     <div className="flex overflow-x-auto pb-4 gap-6 h-[calc(100vh-12rem)]">
                         {/* Unallocated Column */}
